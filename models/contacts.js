@@ -34,7 +34,7 @@ const removeContact = async (contactId) => {
     const contact = data.find((item) => item.id === contactId.toString());
 
     if (!contact) {
-      return null; 
+      return null;
     } else {
       const newData = data.filter((item) => item.id !== contactId.toString());
 
