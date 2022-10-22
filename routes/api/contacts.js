@@ -6,6 +6,7 @@ const {
   addContact,
   updateContact,
 } = require("../../models/contacts");
+const { requestBodyValidation } = require("../../validation");
 
 const router = express.Router();
 
@@ -33,34 +34,22 @@ router.get("/:contactId", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const body = req.body;
+    const { value, error } = requestBodyValidation(req.body);
 
-    if (!body.name) {
-      res.status(400).json({
-        message: "missing required name field",
-      });
-    }
-    if (!body.email) {
-      res.status(400).json({
-        message: "missing required email field",
-      });
-    }
-    if (!body.phone) {
-      res.status(400).json({
-        message: "missing required phone field",
-      });
-    }
+    if (error) {
+      res.status(400).json({ message: `Validation error: ${error.message}` });
+    } else {
+      const data = await addContact(value);
 
-    const data = await addContact(body);
-
-    if (!data) {
-      res.status(400).json({
-        message: `A contact with name '${body.name}' is already exists!`,
-      });
+      if (!data) {
+        res.status(400).json({
+          message: `A contact with name '${value.name}' is already exists!`,
+        });
+      }
+      res.status(201).json({ data, message: "User added successfully" });
     }
-    res.status(201).json({ data, message: "User added successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Server error!" });
+    res.status(500).json({ message: `Server error! ${err.message}` });
   }
 });
 
@@ -82,31 +71,21 @@ router.delete("/:contactId", async (req, res, next) => {
 router.put("/:contactId", async (req, res, next) => {
   try {
     const id = req.params.contactId;
-    const body = req.body;
+    const { value, error } = requestBodyValidation(req.body);
 
-    if (!body.name) {
-      res.status(400).json({
-        message: "missing required name field",
-      });
-    }
-    if (!body.email) {
-      res.status(400).json({
-        message: "missing required email field",
-      });
-    }
-    if (!body.phone) {
-      res.status(400).json({
-        message: "missing required phone field",
-      });
-    }
+    if (error) {
+      res.status(400).json({ message: `Validation error: ${error.message}` });
+    } else {
+      const data = await updateContact(id, value);
 
-    const data = await updateContact(id, body);
+      if (!data) {
+        res
+          .status(404)
+          .json({ message: `A contact with ID '${id}' not found!` });
+      }
 
-    if (!data) {
-      res.status(404).json({ message: `A contact with ID '${id}' not found!` });
+      res.status(200).json({ data, message: "User updated successfully" });
     }
-
-    res.status(200).json({ data, message: "User updated successfully" });
   } catch (err) {
     res.status(500).json({ message: `Server error! ${err.message}` });
   }
