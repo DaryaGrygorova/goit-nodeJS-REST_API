@@ -4,7 +4,7 @@ const path = require("path");
 const contactsPath = path.join(__dirname, "contacts.json");
 const textFormat = "utf8";
 
-const listContacts = async () => {
+const getContactsFromBD = async () => {
   try {
     const res = await fs.readFile(contactsPath, textFormat);
     return JSON.parse(res);
@@ -13,15 +13,14 @@ const listContacts = async () => {
   }
 };
 
+const listContacts = async () => {
+  return await getContactsFromBD();
+};
+
 const getContactById = async (contactId) => {
   try {
-    const res = await fs.readFile(contactsPath, textFormat);
-    const data = JSON.parse(res);
-    const contact = data.filter((item) => item.id === contactId.toString());
-    if (contact.length < 1) {
-      return null;
-    }
-    return contact;
+    const data = await getContactsFromBD();
+    return data.find((item) => item.id === contactId.toString());
   } catch (err) {
     return err;
   }
@@ -29,18 +28,15 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   try {
-    const response = await fs.readFile(contactsPath, textFormat);
-    const data = JSON.parse(response);
+    const data = await getContactsFromBD();
     const contact = data.find((item) => item.id === contactId.toString());
 
-    if (!contact) {
-      return null;
-    } else {
+    if (contact) {
       const newData = data.filter((item) => item.id !== contactId.toString());
 
       await fs.writeFile(contactsPath, JSON.stringify(newData), textFormat);
-      return contact;
     }
+    return contact;
   } catch (err) {
     return err;
   }
@@ -50,12 +46,12 @@ const addContact = async (body) => {
   try {
     const { name, email, phone } = body;
 
-    const res = await fs.readFile(contactsPath, textFormat);
-    const data = JSON.parse(res);
+    const data = await getContactsFromBD();
 
     if (data.find((item) => item.name === name)) {
-      return null;
-    } else {
+      return;
+    } 
+    
       const id = (+data[data.length - 1].id + 1).toString();
       const newContact = { id, name, email, phone };
 
@@ -63,7 +59,7 @@ const addContact = async (body) => {
 
       await fs.writeFile(contactsPath, JSON.stringify(data), textFormat);
       return newContact;
-    }
+    
   } catch (err) {
     return err;
   }
@@ -71,19 +67,22 @@ const addContact = async (body) => {
 
 const updateContact = async (contactId, body) => {
   try {
-    const { name, email, phone } = body;
-    const res = await fs.readFile(contactsPath, textFormat);
-    const data = JSON.parse(res);
+    const newContact = { id: contactId, ...body };
+    const data = await getContactsFromBD();
 
     const contactIdx = data.findIndex((item) => item.id === contactId);
 
     if (contactIdx < 0) {
-      return null;
+      return;
     } else {
-      const newContact = { id: contactId, name, email, phone };
-      data.splice(contactIdx, 1, newContact);
+      const newData = data.map((elem) => {
+        if (elem.id === contactId) {
+          return newContact;
+        }
+        return elem;
+      });
 
-      await fs.writeFile(contactsPath, JSON.stringify(data), textFormat);
+      await fs.writeFile(contactsPath, JSON.stringify(newData), textFormat);
       return newContact;
     }
   } catch (err) {

@@ -18,13 +18,13 @@ const requestBodyValidation = (body) => {
 
     phone: Joi.string()
       .min(5)
-      .max(15)
+      .max(20)
       .pattern(
-        /^[+]?[0-9]{0,3}[-\s. ]?[(]?[0-9]{0,3}[-\s. ][)]?[-\s. ]?[0-9]{0,3}[-\s. ]?[-\s. ]?[0-9]{0,3}[-\s. ]?[0-9]{2,9}$/
+        /^[+]?[(]?[0-9]{0,3}[-\s. ]?[)]?[(]?[0-9]{0,3}[-\s. ]?[)]?[-\s. ]?[0-9]{0,3}[-\s. ]?[-\s. ]?[0-9]{0,3}[-\s. ]?[0-9]{2,9}$/
       )
       .rule({
         message:
-          "Phone number must be digits and can contain spaces, dashes, parentheses and can start with +",
+          "Phone number must be digits and can contain spaces, dashes, parentheses and can start with +. Examples of valid phone number format: +XX(XXX)XXX-XX-XX, (XXX)XXX-XX-XX, XXX-XX-XX.",
       })
       .required(),
   });
