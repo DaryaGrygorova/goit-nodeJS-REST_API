@@ -1,6 +1,8 @@
 require("dotenv").config();
 
-const PORT = process.env.PORT || 3000;
-const HOST_DB = process.env.HOST_DB ||"mongodb+srv://User1:O38vt4aiWriXevYJ@cluster0.htjbfxt.mongodb.net/db-contacts?retryWrites=true&w=majority";
+const config = {
+  PORT: process.env.PORT || 3000,
+  HOST_DB: process.env.HOST_DB,
+};
 
-module.exports = {PORT, HOST_DB};
+module.exports = config;
