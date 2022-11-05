@@ -4,14 +4,14 @@ const { requestBodyValidation, contactStatusValidation } = require("../validatio
 
 const listContacts = async (req, res, next) => {
   const contacts = await Contacts.find();
-  return res.status(200).json({ data: contacts });
+  return res.status(200).json(contacts);
 };
 
 const getContactById = async (req, res, next) => {
   const id = req.params.contactId;
   const contact = await Contacts.findById(id);
   if (contact) {
-    return res.status(200).json({ data: contact });
+    return res.status(200).json(contact);
   }
   return next(createNotFoundHttpError(id));
 };
@@ -22,14 +22,14 @@ const addContact = async (req, res, next) => {
     return next(createValidationError(error));
   }
   const newContact = await Contacts.create(value);
-  return res.status(201).json({ data: newContact });
+  return res.status(201).json(newContact);
 };
 
 const removeContact = async (req, res, next) => {
   const id = req.params.contactId;
   const contact = await Contacts.findByIdAndRemove(id);
   if (contact) {
-    return res.status(200).json({ data: contact });
+    return res.status(200).json(contact);
   }
   return next(createNotFoundHttpError(id));
 };
@@ -47,7 +47,7 @@ const updateContact = async (req, res, next) => {
     { new: true }
   );
   if (newContact) {
-    return res.status(201).json({ data: newContact });
+    return res.status(201).json(newContact);
   }
   return next(createNotFoundHttpError(id));
 };
@@ -66,7 +66,7 @@ const updateStatusContact = async (req, res, next) => {
     { new: true },
   );
   if (contact) {
-    return res.status(200).json({ data: contact });
+    return res.status(200).json(contact);
   }
   return next(createNotFoundHttpError(id));
 };
