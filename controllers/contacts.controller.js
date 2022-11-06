@@ -1,74 +1,68 @@
-const Contact = require("../models/contact.model");
-const { createNotFoundHttpError, createValidationError } = require("../helpers/helpers");
-const { requestBodyValidation, contactStatusValidation } = require("../validation");
+const { Contact } = require("../models");
+const { createNotFoundHttpError } = require("../helpers");
 
 const listContacts = async (req, res, next) => {
-  const contacts = await Contact.find();
+  const { _id } = req.user;
+  const contacts = await Contact.find({ owner: _id }).populate("owner", "_id email");
   return res.status(200).json(contacts);
 };
 
 const getContactById = async (req, res, next) => {
-  const id = req.params.contactId;
-  const contact = await Contact.findById(id);
+  const { _id } = req.user;
+  const { contactId } = req.params;
+  const contact = await Contact.find({ _id: contactId, owner: _id }).populate("owner", "_id email");
   if (contact) {
     return res.status(200).json(contact);
   }
-  return next(createNotFoundHttpError(id));
+  return next(createNotFoundHttpError({ id: contactId }));
 };
 
 const addContact = async (req, res, next) => {
-  const { value, error } = requestBodyValidation(req.body);
-  if (error) {
-    return next(createValidationError(error));
-  }
-  const newContact = await Contact.create(value);
+  const { _id } = req.user;
+  const newContact = await Contact.create({ ...req.body, owner: _id }).populate("owner", "_id email");
   return res.status(201).json(newContact);
 };
 
 const removeContact = async (req, res, next) => {
-  const id = req.params.contactId;
-  const contact = await Contact.findByIdAndRemove(id);
+  const { _id } = req.user;
+  const { contactId } = req.params;
+  const contact = await Contact.findOneAndRemove({
+    _id: contactId,
+    owner: _id,
+  }).populate("owner", "_id email");
   if (contact) {
     return res.status(200).json(contact);
   }
-  return next(createNotFoundHttpError(id));
+  return next(createNotFoundHttpError({ id: contactId }));
 };
 
 const updateContact = async (req, res, next) => {
-  const id = req.params.contactId;
-  const { value, error } = requestBodyValidation(req.body);
-
-  if (error) {
-    return next(createValidationError(error));
-  }
-  const newContact = await Contact.findByIdAndUpdate(
-    id,
-    { ...value },
+  const { _id } = req.user;
+  const { contactId } = req.params;
+  const newContact = await Contact.findOneAndUpdate(
+    { _id: contactId, owner: _id },
+    { ...req.body },
     { new: true }
-  );
+  ).populate("owner", "_id email");
   if (newContact) {
     return res.status(201).json(newContact);
   }
-  return next(createNotFoundHttpError(id));
+  return next(createNotFoundHttpError({ id: contactId }));
 };
 
 const updateStatusContact = async (req, res, next) => {
-  const id = req.params.contactId;
-  const { value: {favorite}, error } = contactStatusValidation(req.body);
-
-  if (error) {
-    return next(createValidationError(error));
-  }
-  
-  const contact = await Contact.findByIdAndUpdate(
-    id,
+  const { _id } = req.user;
+  const { contactId } = req.params;
+  const { favorite } = req.body;
+  const contact = await Contact.findOneAndUpdate(
+    { _id: contactId, owner: _id },
     { favorite },
-    { new: true },
-  );
+    { new: true }
+  ).populate("owner", "_id email");
   if (contact) {
     return res.status(200).json(contact);
   }
-  return next(createNotFoundHttpError(id));
+  return next(createNotFoundHttpError({ id: contactId }));
 };
 
 module.exports = {
@@ -77,5 +71,5 @@ module.exports = {
   addContact,
   removeContact,
   updateContact,
-  updateStatusContact
+  updateStatusContact,
 };

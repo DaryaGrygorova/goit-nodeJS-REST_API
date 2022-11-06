@@ -1,7 +1,6 @@
 const Joi = require("joi");
 
-const requestBodyValidation = (body) => {
-  const schema = Joi.object({
+const requestBodySchema = Joi.object({
     name: Joi.string()
       .pattern(
         /^[a-zA-Zа-яА-Я0-9]+(([' -][a-zA-Zа-яА-Я0-9 ])?[a-zA-Zа-яА-Я0-9]*)*$/
@@ -31,14 +30,19 @@ const requestBodyValidation = (body) => {
     favorite: Joi.boolean(),
   });
 
-  return schema.validate(body);
+const contactStatusSchema = Joi.object({
+    favorite: Joi.boolean().required(),
+  });
+
+ 
+const userAuthSchema = Joi.object({
+    password: Joi.string().alphanum().min(6).required(),
+    email: Joi.string().email({ minDomainSegments: 2 }).required(),
+  });
+
+
+module.exports = {
+  requestBodySchema,
+  contactStatusSchema,
+  userAuthSchema,
 };
-
-const contactStatusValidation = (body) => {
-  const schema = Joi.object({
-    favorite: Joi.boolean().required()})
-
-  return schema.validate(body);
-};
-
-module.exports = { requestBodyValidation, contactStatusValidation };
