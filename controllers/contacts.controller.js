@@ -1,15 +1,15 @@
-const Contacts = require("../models/contacts.model");
+const Contact = require("../models/contact.model");
 const { createNotFoundHttpError, createValidationError } = require("../helpers/helpers");
 const { requestBodyValidation, contactStatusValidation } = require("../validation");
 
 const listContacts = async (req, res, next) => {
-  const contacts = await Contacts.find();
+  const contacts = await Contact.find();
   return res.status(200).json(contacts);
 };
 
 const getContactById = async (req, res, next) => {
   const id = req.params.contactId;
-  const contact = await Contacts.findById(id);
+  const contact = await Contact.findById(id);
   if (contact) {
     return res.status(200).json(contact);
   }
@@ -21,13 +21,13 @@ const addContact = async (req, res, next) => {
   if (error) {
     return next(createValidationError(error));
   }
-  const newContact = await Contacts.create(value);
+  const newContact = await Contact.create(value);
   return res.status(201).json(newContact);
 };
 
 const removeContact = async (req, res, next) => {
   const id = req.params.contactId;
-  const contact = await Contacts.findByIdAndRemove(id);
+  const contact = await Contact.findByIdAndRemove(id);
   if (contact) {
     return res.status(200).json(contact);
   }
@@ -41,7 +41,7 @@ const updateContact = async (req, res, next) => {
   if (error) {
     return next(createValidationError(error));
   }
-  const newContact = await Contacts.findByIdAndUpdate(
+  const newContact = await Contact.findByIdAndUpdate(
     id,
     { ...value },
     { new: true }
@@ -60,7 +60,7 @@ const updateStatusContact = async (req, res, next) => {
     return next(createValidationError(error));
   }
   
-  const contact = await Contacts.findByIdAndUpdate(
+  const contact = await Contact.findByIdAndUpdate(
     id,
     { favorite },
     { new: true },
