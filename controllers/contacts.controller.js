@@ -11,12 +11,14 @@ const listContacts = async (req, res, next) => {
     : { owner: _id };
   const queryOptions = { skip: skip, limit: Number(limit) };
 
+   const totalCount = await Contact.find(filterOptions).count();
+
   const contacts = await Contact.find(filterOptions, "", queryOptions).populate(
     "owner",
     "_id email"
   );
 
-  return res.status(200).json({ contacts, page, limit });
+  return res.status(200).json({ contacts, page, limit, totalCount });
 };
 
 const getContactById = async (req, res, next) => {
