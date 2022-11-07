@@ -17,7 +17,7 @@ const auth = async (req, res, next) => {
       return next(createAuthError());
     };
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, {password:0});
     if (!user || !user.token) {
       return next(createAuthError());
     };
