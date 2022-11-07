@@ -5,23 +5,24 @@ const { SECRET_KEY } = require("../config");
 
 const auth = async (req, res, next) => {
   try {
-  const { authorization = "" } = req.headers;
-  const [tokenType, token] = authorization.split(" ");
+    const { authorization = "" } = req.headers;
+    const [tokenType, token] = authorization.split(" ");
 
-  if (!token || tokenType !== "Bearer") {
-    return next(createAuthError());
-  }
+    if (!token || tokenType !== "Bearer") {
+      return next(createAuthError());
+    }
 
     const { userId } = jwt.verify(token, SECRET_KEY);
     if (!userId) {
       return next(createAuthError());
     };
 
-    const user = await User.findById({ _id: userId });
+    const user = await User.findById(userId);
     if (!user || !user.token) {
       return next(createAuthError());
     };
     req.user = user;
+
     next();
   } catch (err) {
     next(createAuthError(err.message));

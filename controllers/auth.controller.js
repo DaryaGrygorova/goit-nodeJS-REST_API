@@ -74,4 +74,21 @@ const getCurrent = async (req, res, next) => {
   });
 };
 
-module.exports = { login, logout, signup, getCurrent };
+const subscriptionStatusUpdate = async (req, res, next) =>{
+  const { _id, email } = req.user;
+
+  const { subscription } = req.body;
+  const user = await User.findByIdAndUpdate(
+    _id,
+    { subscription },
+    { new: true }
+  );
+
+  if (!user) {
+    return next(createCustomError());
+  }
+
+  return res.status(200).json({user:{ email, subscription} });
+};
+
+module.exports = { login, logout, signup, getCurrent, subscriptionStatusUpdate };
