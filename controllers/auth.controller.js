@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const {
-  createConflictError,
+  createEmailExistError,
   createAuthError,
   createCustomError,
 } = require("../helpers/errorHelpers");
@@ -10,7 +10,7 @@ const { SECRET_KEY } = require("../config");
 const signup = async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (user) {
-    return next(createConflictError());
+    return next(createEmailExistError());
   }
 
   const { email, subscription } = await User.create(req.body);
@@ -66,12 +66,10 @@ const logout = async (req, res, next) => {
 };
 
 const getCurrent = async (req, res, next) => {
-  const { token, email, subscription } = req.user;
+  const { email, subscription } = req.user;
 
-  return res.status(200).json({
-    token,
-    user: { email, subscription },
-  });
+  return res.status(200).json(
+    { email, subscription });
 };
 
 const subscriptionStatusUpdate = async (req, res, next) =>{

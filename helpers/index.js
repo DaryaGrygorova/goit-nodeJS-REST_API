@@ -1,7 +1,7 @@
 const {
     createNotFoundHttpError,
     createValidationError,
-    createConflictError,
+    createEmailExistError,
     createAuthError
   } = require('./errorHelpers');
 
@@ -9,7 +9,7 @@ const {
 module.exports = {
     createNotFoundHttpError,
     createValidationError,
-    createConflictError,
+    createEmailExistError,
     createAuthError
   };
   
