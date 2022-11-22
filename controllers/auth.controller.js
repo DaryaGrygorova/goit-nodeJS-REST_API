@@ -105,7 +105,7 @@ const avatarUpdate = async (req, res, next) => {
 
     const user = await User.findByIdAndUpdate(
       _id,
-      { avatarURL: encodeURI(`${SERVER_HOST}${UPLOAD_DIR_AVATARS}/${file.filename}`)},
+      { avatarURL: encodeURI(`${SERVER_HOST}/avatars/${file.filename}`)},
       { new: true }
     );
     return res.status(201).json({ avatarURL: user.avatarURL });

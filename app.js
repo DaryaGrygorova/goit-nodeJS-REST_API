@@ -3,6 +3,7 @@ const logger = require("morgan");
 const cors = require("cors");
 
 const {authRouter, contactsRouter} = require("./routes/api");
+const {UPLOAD_DIR_AVATARS } = require("./config");
 
 const app = express();
 
@@ -12,7 +13,7 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-app.use('/public/avatars', express.static('public/avatars'));
+app.use('/avatars', express.static(`${UPLOAD_DIR_AVATARS}`));
 
 app.use("/api/users", authRouter);
 app.use("/api/contacts", contactsRouter);
