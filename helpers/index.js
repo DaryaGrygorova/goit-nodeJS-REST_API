@@ -7,6 +7,7 @@ const {
   } = require('./errorHelpers');
 
 const {avatarImgAdapter} = require('./avatarImgAdapter');
+const {createFolderIsNotExist} = require('./createFolderIsNotExist');
 
 module.exports = {
     createNotFoundHttpError,
@@ -15,5 +16,6 @@ module.exports = {
     createAuthError,
     createCustomError,
     avatarImgAdapter,
+    createFolderIsNotExist,
   };
   

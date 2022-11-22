@@ -5,6 +5,8 @@ const config = {
   HOST_DB: process.env.HOST_DB,
   HOST_DB_TEST: process.env.HOST_DB_TEST,
   SECRET_KEY: process.env.SECRET_KEY || 'SECRET_KEY',
+  UPLOAD_DIR_TMP: "tmp",
+  UPLOAD_DIR_AVATARS: "/public/avatars",
 };
 
 module.exports = config;
