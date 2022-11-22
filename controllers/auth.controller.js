@@ -9,7 +9,7 @@ const {
   createCustomError,
   avatarImgAdapter,
   } = require("../helpers");
-const { SECRET_KEY } = require("../config");
+const { SECRET_KEY, SERVER_HOST, UPLOAD_DIR_AVATARS } = require("../config");
 
 const signup = async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
@@ -97,7 +97,7 @@ const avatarUpdate = async (req, res, next) => {
     user: { _id },
     file,
   } = req;
-  const avatarDirPath = path.join(__dirname, "../", "public", "avatars");
+  const avatarDirPath = path.join(__dirname, "../", UPLOAD_DIR_AVATARS);
 
   try {
     await avatarImgAdapter({ file, size: 250 });
@@ -105,7 +105,7 @@ const avatarUpdate = async (req, res, next) => {
 
     const user = await User.findByIdAndUpdate(
       _id,
-      { avatarURL: `avatars/${file.filename}` },
+      { avatarURL: encodeURI(`${SERVER_HOST}${UPLOAD_DIR_AVATARS}/${file.filename}`)},
       { new: true }
     );
     return res.status(201).json({ avatarURL: user.avatarURL });
