@@ -1,16 +1,20 @@
 const jwt = require("jsonwebtoken");
+const fs = require("fs/promises");
+const path = require("path");
+
 const { User } = require("../models");
 const {
-  createConflictError,
+  createEmailExistError,
   createAuthError,
   createCustomError,
-} = require("../helpers/errorHelpers");
-const { SECRET_KEY } = require("../config");
+  avatarImgAdapter,
+  } = require("../helpers");
+const { SECRET_KEY, SERVER_HOST, UPLOAD_DIR_AVATARS } = require("../config");
 
 const signup = async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (user) {
-    return next(createConflictError());
+    return next(createEmailExistError());
   }
 
   const { email, subscription } = await User.create(req.body);
@@ -66,15 +70,12 @@ const logout = async (req, res, next) => {
 };
 
 const getCurrent = async (req, res, next) => {
-  const { token, email, subscription } = req.user;
+  const { email, subscription, avatarURL } = req.user;
 
-  return res.status(200).json({
-    token,
-    user: { email, subscription },
-  });
+  return res.status(200).json({ email, subscription, avatarURL });
 };
 
-const subscriptionStatusUpdate = async (req, res, next) =>{
+const subscriptionStatusUpdate = async (req, res, next) => {
   const { _id, email } = req.user;
 
   const { subscription } = req.body;
@@ -91,4 +92,35 @@ const subscriptionStatusUpdate = async (req, res, next) =>{
   return res.status(200).json({user:{ email, subscription} });
 };
 
-module.exports = { login, logout, signup, getCurrent, subscriptionStatusUpdate };
+const avatarUpdate = async (req, res, next) => {
+  const {
+    user: { _id },
+    file,
+  } = req;
+  const avatarDirPath = path.join(__dirname, "../", UPLOAD_DIR_AVATARS);
+
+  try {
+    await avatarImgAdapter({ file, size: 250 });
+    await fs.rename(file.path, path.join(avatarDirPath, file.filename));
+
+    const user = await User.findByIdAndUpdate(
+      _id,
+      { avatarURL: encodeURI(`${SERVER_HOST}/avatars/${file.filename}`)},
+      { new: true }
+    );
+    return res.status(201).json({ avatarURL: user.avatarURL });
+
+  } catch (err) {
+    await fs.unlink(file.path);
+    throw createCustomError(500, `File not saved. Error: ${err.message}`);
+  }
+};
+
+module.exports = {
+  login,
+  logout,
+  signup,
+  getCurrent,
+  subscriptionStatusUpdate,
+  avatarUpdate,
+};

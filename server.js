@@ -1,6 +1,9 @@
 const app = require("./app");
 const mongoose = require("mongoose");
-const { PORT, HOST_DB } = require("./config");
+const path = require("path");
+const {createFolderIsNotExist} = require("./helpers")
+
+const { PORT, HOST_DB, UPLOAD_DIR_TMP, UPLOAD_DIR_AVATARS } = require("./config");
 
 const start = async () => {
   try {
@@ -10,6 +13,10 @@ const start = async () => {
 
     await mongoose.connect(HOST_DB);
     console.log("Database connection successful");
+
+    await createFolderIsNotExist(path.join(__dirname, "./", UPLOAD_DIR_TMP));
+    await createFolderIsNotExist(path.join(__dirname, "./", UPLOAD_DIR_AVATARS));
+
     app.listen(PORT, () => {
       console.log(`Server running. Use our API on port: ${PORT}`);
     });

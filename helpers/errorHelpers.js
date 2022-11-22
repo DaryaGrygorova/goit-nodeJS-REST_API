@@ -12,7 +12,7 @@ const createValidationError = (err)=> {
   return err;
 }
 
-const createConflictError = ()=> {
+const createEmailExistError = ()=> {
   const err = new Error; 
   err.message = "Email in use";
   err.status = 409;
@@ -35,7 +35,7 @@ const createCustomError = (status, message)=>{
 module.exports = {
   createNotFoundHttpError,
   createValidationError,
-  createConflictError,
+  createEmailExistError,
   createAuthError,
   createCustomError
 };
