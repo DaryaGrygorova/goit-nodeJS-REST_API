@@ -8,6 +8,7 @@ const {
 
 const {avatarImgAdapter} = require('./avatarImgAdapter');
 const {createFolderIsNotExist} = require('./createFolderIsNotExist');
+const {sendMail, sendVerificationMail} = require('./mailSender');
 
 module.exports = {
     createNotFoundHttpError,
@@ -17,5 +18,7 @@ module.exports = {
     createCustomError,
     avatarImgAdapter,
     createFolderIsNotExist,
+    sendMail,
+    sendVerificationMail,
   };
   
