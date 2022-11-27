@@ -8,21 +8,27 @@ const {
 
 
 const sendMail = async ({to, from, subject, text, html}) => {
-sgMail.setApiKey(SENDGRID_API_KEY)
+try {
 
-const msg =  {to, from, subject, text, html}
-
-sgMail
+  sgMail.setApiKey(SENDGRID_API_KEY)
+  
+  const msg =  {to, from, subject, text, html}
+  
+  sgMail
   .send(msg)
   .then(() => {
     console.log('Email sent')
   })
-  .catch((error) => {
-    throw createCustomError(400, error.message);
+  .catch((err) => {
+    throw createCustomError(400, err.message);
   });
+} catch (err) {
+  throw createCustomError(400, err.message);
+}
 };
 
 const sendVerificationMail = async ({email, verificationToken, isRepeat = false}) =>{
+  try {
   sendMail({
     to: email,
     from: VERIFIED_SENDER_EMAIL,
@@ -31,7 +37,9 @@ const sendVerificationMail = async ({email, verificationToken, isRepeat = false}
     html: `<h3>Thanks for signing up to My Contacts Database.</h3> 
             <p>Before we can continue, we need to validate your email address ${email}.</p>
             <a href='${SERVER_HOST}/api/users/verify/${verificationToken}'>ACTIVATE ACCOUNT</a>`,
-  });
+  });} catch (err) {
+    throw createCustomError(400, err.message);
+  }
 }
 
   module.exports = {sendMail, sendVerificationMail};
